@@ -1,20 +1,19 @@
 // Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
-import { describeProject } from './describeProject';
-import { visualizeDatabase } from './visualizeDatabase';
-import { searchConfluence } from './searchConfluence';
+import * as vscode from "vscode";
+import { describeProject } from "./describeProject";
+import { visualizeDatabase } from "./visualizeDatabase";
 import {
   ChatBuilder,
   setPrompt,
   getGHPResponse as getGitHubCopilotResponse,
   addResponseToChat,
   writeToChat,
-} from './chatBuilder';
-import { defaultRequestProcessor } from './defaultPromptProcessor';
-import { describeGRPcProtos } from './describeGRPcProtos';
-import path from 'path';
-import { describeMigrationFolder } from './describeMigrationFolder';
-import { listAllRPCs } from './listAllRPCs';
+} from "./chatBuilder";
+import { defaultRequestProcessor } from "./defaultPromptProcessor";
+import { describeGRPcProtos } from "./describeGRPcProtos";
+import path from "path";
+import { describeMigrationFolder } from "./describeMigrationFolder";
+import { listAllRPCs } from "./listAllRPCs";
 
 export const ASIChatHandler: vscode.ChatRequestHandler = async (
   request: vscode.ChatRequest,
@@ -28,7 +27,7 @@ export const ASIChatHandler: vscode.ChatRequestHandler = async (
     stream: stream,
     token: token,
     messages: [],
-    projectRootPath: '',
+    projectRootPath: "",
     projectReadmePath: undefined,
     serviceConfigPath: undefined,
     projectMainPath: undefined,
@@ -46,7 +45,7 @@ export const ASIChatHandler: vscode.ChatRequestHandler = async (
     builder.projectRootPath = workspaceFolders[0].uri.fsPath;
   }
 
-  if (request.command === 'describeMigrationFolder') {
+  if (request.command === "describeMigrationFolder") {
     const prompt = await describeMigrationFolder();
     console.log(`PROMPT`, prompt);
     setPrompt(builder, prompt);
@@ -55,40 +54,40 @@ export const ASIChatHandler: vscode.ChatRequestHandler = async (
     return;
   }
 
-  if (request.command === 'listAllRPCs') {
+  if (request.command === "listAllRPCs") {
     try {
       const prompts = await listAllRPCs();
       for (let [protoNameAsKey, prompt] of prompts) {
         setPrompt(builder, prompt);
         const chatResponse = await getGitHubCopilotResponse(builder);
         const pathInString =
-          'http://gitlab.com/appliedsystems/products/policy-works/services/' +
+          "http://gitlab.com/appliedsystems/products/policy-works/services/" +
           path.basename(builder.projectRootPath) +
-          '/-/blob/main/pkg/grpc/v1/proto/' +
+          "/-/blob/main/pkg/grpc/v1/proto/" +
           protoNameAsKey;
         const symbolLocation: vscode.Uri = vscode.Uri.parse(pathInString);
         // Render an inline anchor to a symbol in the workspace
-        await writeToChat(builder, '\n\n');
+        await writeToChat(builder, "\n\n");
         stream.anchor(symbolLocation, protoNameAsKey);
         await addResponseToChat(builder, chatResponse);
       }
       return;
     } catch (error) {}
   }
-  if (request.command === 'describeGRPcProtos') {
+  if (request.command === "describeGRPcProtos") {
     try {
       const prompts = await describeGRPcProtos(context);
       for (let [protoNameAsKey, prompt] of prompts) {
         setPrompt(builder, prompt);
         const chatResponse = await getGitHubCopilotResponse(builder);
         const pathInString =
-          'http://gitlab.com/appliedsystems/products/policy-works/services/' +
+          "http://gitlab.com/appliedsystems/products/policy-works/services/" +
           path.basename(builder.projectRootPath) +
-          '/-/blob/main/pkg/grpc/v1/proto/' +
+          "/-/blob/main/pkg/grpc/v1/proto/" +
           protoNameAsKey;
         const symbolLocation: vscode.Uri = vscode.Uri.parse(pathInString);
         // Render an inline anchor to a symbol in the
-        await writeToChat(builder, '\n\n');
+        await writeToChat(builder, "\n\n");
         stream.anchor(symbolLocation, protoNameAsKey);
         await addResponseToChat(builder, chatResponse);
       }
@@ -96,19 +95,13 @@ export const ASIChatHandler: vscode.ChatRequestHandler = async (
     } catch (error) {}
   }
 
-  if (request.command === 'describeProject') {
+  if (request.command === "describeProject") {
     await describeProject(builder);
     return;
   }
 
-  if (request.command === 'visualizeDatabase') {
+  if (request.command === "visualizeDatabase") {
     await visualizeDatabase(context, builder);
-    return;
-  }
-
-  if (request.command === 'searchConfluence') {
-    const searchParam = request.prompt;
-    await searchConfluence(context, builder, searchParam);
     return;
   }
 
