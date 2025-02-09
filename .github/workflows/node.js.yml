@@ -33,9 +33,5 @@ jobs:
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./*.vsix
-          asset_name: ${{ github.event.release.tag_name }}.vsix
-          asset_content_type: application/vsix
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          name: chat.ivar-project-assistant.vsix
+          path: .../*.vsix
